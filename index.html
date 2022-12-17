@@ -1,0 +1,120 @@
+<html>
+  <head>
+    <title>GPT-3 Chatbot</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+      #chatform {
+        display: flex;
+      }
+      #chatinput {
+        flex: 1;
+        padding: 0.5em;
+        border: none;
+        border-radius: 3px 0 0 3px;
+      }
+      button[type="submit"] {
+        padding: 0.5em 1em;
+        border: none;
+        border-radius: 0 3px 3px 0;
+        background-color: #3366BB;
+        color: white;
+      }
+      #chatlog {
+        padding: 1em;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        max-height: calc(100vh - 10em);
+        overflow-y: auto;
+      }
+      #chatlog p {
+        margin: 0.5em 0;
+      }
+      #chatlog p.user {
+        text-align: right;
+        background-color: #eee;
+      }
+      #chatlog p.bot {
+        text-align: left;
+        background-color: #ddd;
+      }
+      #suggestions {
+        display: flex;
+        flex-wrap: wrap;
+        margin-top: 0.5em;
+      }
+      #suggestions button {
+        margin: 0 0.5em 0.5em 0;
+        padding: 0.5em 1em;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        background-color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>GPT-3 Chatbot</h1>
+    <form id="chatform">
+      <input type="text" id="chatinput" placeholder="Enter your message here...">
+      <button type="submit">Send</button>
+    </form>
+    <div id="suggestions">
+      <button type="button" data-message="What is your name?">What is your name?</button>
+      <button type="button" data-message="What is the weather like today?">What is the weather like today?</button>
+      <button type="button" data-message="Tell me a joke.">Tell me a joke.</button>
+      <button type="button" data-message="Do you have any hobbies?">Do you have any hobbies?</button>
+    </div>
+    <div id="chatlog"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+      const API_KEY = "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";
+      const chatform = document.getElementById("chatform");
+      const chatinput = document.getElementById("chatinput");
+      const chatlog = document.getElementById("chatlog");
+      const suggestions = document.getElementById("suggestions");
+
+      chatform.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        // Get the user's input
+        const message = chatinput.value;
+
+        // Clear the input field
+        chatinput.value = "";
+
+        // Add the user's message to the chat log
+        const userMessage = document.createElement("p");
+        userMessage.innerText = "You: " + message;
+        userMessage.classList.add("user");
+        chatlog.appendChild(userMessage);
+
+        // Send the user's message to GPT-3
+        axios.post("https://api.openai.com/v1/completions", {
+          prompt: message,
+          model: "text-davinci-002",
+          temperature: 0.5,
+          max_tokens: 2048,
+          top_p: 1,
+          frequency_penalty: 0,
+          presence_penalty: 0,
+        }, {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization":  `Bearer ${API_KEY}`,
+          },
+        }).then((response) => {
+          // Display the GPT-3 response in the chat log
+          const botMessage = document.createElement("p");
+          botMessage.innerText = "Bot: " + response.data.choices[0].text;
+          chatlog.appendChild(botMessage);
+        }).catch((error) => {
+          console.error(error);
+        });
+      });
+    </script>
+  </body>
+</html>
+
+
